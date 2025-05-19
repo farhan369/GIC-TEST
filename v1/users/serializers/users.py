@@ -5,6 +5,7 @@ from common.serializers.custom_fields import AgeField
 
 class UserSerializer(serializers.ModelSerializer):
     age = AgeField(min_age=0, max_age=120)
+    first_name = serializers.CharField(required=True)
     
     class Meta:
         model = CustomUser
