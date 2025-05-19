@@ -14,5 +14,6 @@ you will be able to see the output as desired
 
 task 2 
 1. run python manage.py runserver
-2. run the tests file of the middleware or test file of csv upload - python manage.py test middleware.rate_limiter v1.users.tests.test_csv_upload
+2. run the api end point - http://127.0.0.1:8000/rate-limiter/test/200/ where 200 is the number of requests you want to test
+3. if you want to clear cache run the api end point - http://127.0.0.1:8000/rate-limiter/clear/
 

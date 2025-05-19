@@ -16,6 +16,7 @@ class RateLimitMiddleware(MiddlewareMixin):
     """
     RATE_LIMIT_MAX_REQUESTS = getattr(settings, 'RATE_LIMIT_MAX_REQUESTS', 100)
     RATE_LIMIT_WINDOW_SECONDS = getattr(settings, 'RATE_LIMIT_WINDOW_SECONDS', 300)
+    EXCLUDED_PATHS = ['/rate-limiter/clear/']  
 
     def get_client_ip(self, request):
         """
@@ -30,6 +31,10 @@ class RateLimitMiddleware(MiddlewareMixin):
         """
         Processes the incoming request to check for rate limiting.
         """
+        # Skip rate limiting for excluded paths
+        if request.path in self.EXCLUDED_PATHS:
+            return None
+
         ip_address = self.get_client_ip(request)
         if not ip_address:
             return None
@@ -66,6 +71,10 @@ class RateLimitMiddleware(MiddlewareMixin):
         """
         Adds rate limit headers to the response for successful requests.
         """
+        # Don't add rate limit headers for excluded paths
+        if request.path in self.EXCLUDED_PATHS:
+            return response
+
         if hasattr(request, '_rate_limit_remaining'):
             response['X-RateLimit-Limit'] = self.RATE_LIMIT_MAX_REQUESTS
             response['X-RateLimit-Remaining'] = request._rate_limit_remaining
