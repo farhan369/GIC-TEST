@@ -30,8 +30,7 @@ class CSVUploadView(APIView):
                 {"error": "Invalid file type. Only CSV files are allowed."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        file_obj = request.data['file']
-        csv_content = file_obj.read().decode('utf-8')
+        csv_content = file.read().decode('utf-8')
 
         task = csv_upload_tasks.process_csv_upload.delay(csv_content)
         return Response(

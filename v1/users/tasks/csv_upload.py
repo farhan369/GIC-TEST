@@ -22,6 +22,8 @@ def process_csv_upload(csv_data):
     errors = []
 
     for row_num, row in enumerate(reader, start=1):
+        name = row["name"].strip().split(" ")
+        row["first_name"], row["last_name"] = name[0], " ".join(name[1:])
         serializer = user_serializers.UserSerializer(data=row)
 
         if serializer.is_valid():
