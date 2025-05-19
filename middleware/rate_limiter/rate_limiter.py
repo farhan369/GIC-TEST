@@ -72,4 +72,3 @@ class RateLimitMiddleware(MiddlewareMixin):
             response['X-RateLimit-Reset'] = int(request._rate_limit_reset)
 
         return response
-

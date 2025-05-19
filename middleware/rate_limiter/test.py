@@ -198,5 +198,3 @@ class RateLimitMiddlewareTests(TestCase):
             self.assertEqual(processed_response['X-RateLimit-Limit'], str(RATE_LIMIT_MAX_REQUESTS))
             self.assertEqual(processed_response['X-RateLimit-Remaining'], str(RATE_LIMIT_MAX_REQUESTS - (i + 1)))
             self.assertTrue('X-RateLimit-Reset' in processed_response)
-
-

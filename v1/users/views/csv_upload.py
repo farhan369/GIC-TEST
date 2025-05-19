@@ -1,4 +1,3 @@
-import csv
 from pathlib import Path
 
 from rest_framework.views import APIView
@@ -37,3 +36,4 @@ class CSVUploadView(APIView):
             {"message": "CSV processing started.", "task_id": task.id},
             status=status.HTTP_202_ACCEPTED
         )
+        
