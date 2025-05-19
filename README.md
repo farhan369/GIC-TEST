@@ -15,5 +15,5 @@ you will be able to see the output as desired
 task 2 
 1. run python manage.py runserver
 2. run the api end point - http://127.0.0.1:8000/rate-limiter/test/200/ where 200 is the number of requests you want to test
-3. if you want to clear cache run the api end point - http://127.0.0.1:8000/rate-limiter/clear/
+3. if you want to clear cache run the api end point - http://127.0.0.1:8000/rate-limiter/clear/ (this is excluded from middleware)
 
