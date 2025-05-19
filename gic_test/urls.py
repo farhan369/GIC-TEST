@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('tasks/<str:task_id>/status/', TaskStatusView.as_view(), name='task_status'),
     path('v1/users/', include('v1.users.urls')),
+    path('rate-limiter/', include('middleware.rate_limiter.urls')),
 ]
