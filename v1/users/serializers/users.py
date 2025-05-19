@@ -1,8 +1,11 @@
 from rest_framework import serializers
 from v1.users.models import CustomUser
+from common.serializers.custom_fields import AgeField
 
 
 class UserSerializer(serializers.ModelSerializer):
+    age = AgeField(min_age=0, max_age=120)
+    
     class Meta:
         model = CustomUser
         fields = [
@@ -12,8 +15,3 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'age'
         ]
-
-    def validate_age(self, value):
-        if value is not None and not (0 <= value <= 120):
-            raise serializers.ValidationError("Age must be between 0 and 120.")
-        return value
