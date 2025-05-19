@@ -17,11 +17,20 @@ class RateLimitMiddleware(MiddlewareMixin):
     RATE_LIMIT_MAX_REQUESTS = getattr(settings, 'RATE_LIMIT_MAX_REQUESTS', 100)
     RATE_LIMIT_WINDOW_SECONDS = getattr(settings, 'RATE_LIMIT_WINDOW_SECONDS', 300)
 
+    def get_client_ip(self, request):
+        """
+        Get client IP from X-Forwarded-For header or REMOTE_ADDR
+        """
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            return x_forwarded_for.split(',')[0].strip()
+        return request.META.get('REMOTE_ADDR')
+
     def process_request(self, request):
         """
         Processes the incoming request to check for rate limiting.
         """
-        ip_address = request.META.get('REMOTE_ADDR')
+        ip_address = self.get_client_ip(request)
         if not ip_address:
             return None
 
@@ -39,14 +48,17 @@ class RateLimitMiddleware(MiddlewareMixin):
         cache.set(cache_key, request_timestamps, timeout=self.RATE_LIMIT_WINDOW_SECONDS + 60)
 
         remaining_requests = self.RATE_LIMIT_MAX_REQUESTS - len(request_timestamps)
+        reset_time = current_time + self.RATE_LIMIT_WINDOW_SECONDS
+
+        request._rate_limit_remaining = remaining_requests
+        request._rate_limit_reset = reset_time
 
         if len(request_timestamps) > self.RATE_LIMIT_MAX_REQUESTS:
             response = HttpResponse("Too Many Requests", status=429)
             response['X-RateLimit-Limit'] = self.RATE_LIMIT_MAX_REQUESTS
             response['X-RateLimit-Remaining'] = 0
+            response['X-RateLimit-Reset'] = int(reset_time)
             return response
-
-        request._rate_limit_remaining = remaining_requests
 
         return None
 
@@ -54,10 +66,10 @@ class RateLimitMiddleware(MiddlewareMixin):
         """
         Adds rate limit headers to the response for successful requests.
         """
-
         if hasattr(request, '_rate_limit_remaining'):
-            response['X-RateLimit-Limit'] =  self.RATE_LIMIT_MAX_REQUESTS
+            response['X-RateLimit-Limit'] = self.RATE_LIMIT_MAX_REQUESTS
             response['X-RateLimit-Remaining'] = request._rate_limit_remaining
+            response['X-RateLimit-Reset'] = int(request._rate_limit_reset)
 
         return response
 
